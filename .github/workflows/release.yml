@@ -22,6 +22,9 @@ jobs:
           - os: macos-latest
             artifact_name: archive
             asset_name: archive-macos-arm64
+          - os: macos-13
+            artifact_name: archive
+            asset_name: archive-macos-x64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

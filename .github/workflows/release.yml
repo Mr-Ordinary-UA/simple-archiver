@@ -14,34 +14,46 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            artifact_name: archive.exe
-            asset_name: archive-windows-x64.exe
+            asset_name: archive-gui-windows-x64.exe
           - os: ubuntu-latest
-            artifact_name: archive
-            asset_name: archive-linux-x64
+            asset_name: archive-gui-linux-x64
           - os: macos-latest
-            artifact_name: archive
-            asset_name: archive-macos-arm64
+            asset_name: archive-gui-macos-arm64
           - os: macos-14
-            artifact_name: archive
-            asset_name: archive-macos-x64
+            asset_name: archive-gui-macos-x64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build
+      - name: Build C++ Core
         run: cmake --build build --config Release
 
-      - name: Locate binary (Windows)
+      - name: Package with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
-        run: copy build\Release\${{ matrix.artifact_name }} ${{ matrix.asset_name }}
+        run: pyinstaller --noconsole --onefile --add-data "build\Release\*.pyd;." python\gui.py
 
-      - name: Locate binary (Unix)
+      - name: Package with PyInstaller (Unix)
         if: matrix.os != 'windows-latest'
-        run: cp build/${{ matrix.artifact_name }} ${{ matrix.asset_name }}
+        run: pyinstaller --noconsole --onefile --add-data "build/*.so:." python/gui.py
+
+      - name: Rename binary (Windows)
+        if: matrix.os == 'windows-latest'
+        run: move dist\gui.exe ${{ matrix.asset_name }}
+
+      - name: Rename binary (Unix)
+        if: matrix.os != 'windows-latest'
+        run: mv dist/gui ${{ matrix.asset_name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

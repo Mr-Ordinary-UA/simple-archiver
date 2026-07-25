@@ -69,3 +69,12 @@ Testing/
 .cache/
 
 .vscode/
+
+*.pyd
+__pycache__/
+
+dist/
+*.spec
+
+venv/
+.venv/

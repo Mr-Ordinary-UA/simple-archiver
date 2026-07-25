@@ -41,11 +41,11 @@ jobs:
 
       - name: Package with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
-        run: pyinstaller --noconsole --onefile --add-data "build\Release\*.pyd;." python\gui.py
+        run: pyinstaller --noconsole --onefile --add-data "python\*.pyd;." python\gui.py
 
       - name: Package with PyInstaller (Unix)
         if: matrix.os != 'windows-latest'
-        run: pyinstaller --noconsole --onefile --add-data "build/*.so:." python/gui.py
+        run: pyinstaller --noconsole --onefile --add-data "python/*.so:." python/gui.py
 
       - name: Rename binary (Windows)
         if: matrix.os == 'windows-latest'

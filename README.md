@@ -1,108 +1,147 @@
 # simple-archiver
 
-A simple file archiver based on the RLE (Run-Length Encoding) algorithm. This project serves as a portfolio piece demonstrating file handling, binary data manipulation, and error processing in C++.
-
-A console version is currently available. A graphical interface is planned.
+A file archiver based on the RLE (Run-Length Encoding) algorithm. This project demonstrates file handling, binary data processing, and C++ performance with Python GUI integration.
 
 ## RLE Description
 
-RLE is a data compression method that replaces sequences of identical bytes with a pair of values: a repeat count and the byte itself. A sequence of ten identical characters takes less space in compressed form than in the original.
+RLE replaces identical repeating byte sequences with count-value pairs. A sequence of ten identical characters takes less space in compressed form than in the original file.
 
-The method works well on files with a large amount of repeating data, such as simple images or repetitive texts. On random or already compressed data (archives, JPEG photos), the size after compression might not decrease. In this case, the program saves the file without compression and marks it as raw.
+The method works well on files with repeating data. On random or previously compressed data, the size after compression does not decrease. The application detects such cases and saves raw unmodified data.
 
-## Program Features
+## Version 2.x (GUI Version)
 
-- Compresses a file into a custom archive format
-- Decompresses the archive back into the original file
-- Shows the size before and after compression, along with the compression ratio
-- Verifies archive integrity before decompression
-- Deletes the original file after successful compression or decompression
+Graphical interface version built with Python Tkinter and C++ core via pybind11.
 
-## Build Requirements
+### Features
 
-- CMake version 3.15 or newer
-- Any C++ compiler supporting the C++17 standard: MSVC (Visual Studio), MinGW (g++), or Clang
+- Graphical interface built with Tkinter
+- Fast C++ compression core integrated via pybind11
+- Automated cross-platform builds for Windows, Linux, and macOS
 
-Check if CMake is installed:
+### Build Requirements
 
-```bash
-cmake --version
-```
+- CMake 3.15 or newer
+- C++17 compiler (MSVC, GCC, or Clang)
+- Python 3.11 or newer
+- PyInstaller module
 
-If the command is not found, install CMake from the official website: [cmake.org](https://cmake.org).
-
-## Building the Project
+### Building Version 2.x
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/Mr-Ordinary-UA/simple-archiver.git
+git clone [https://github.com/Mr-Ordinary-UA/simple-archiver.git](https://github.com/Mr-Ordinary-UA/simple-archiver.git)
 cd simple-archiver
 ```
 
-Create a build folder and navigate into it:
+Build the C++ core:
 
 ```bash
-mkdir build
-cd build
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
 ```
 
-Generate the build files. This command finds the compiler installed on your system and prepares the necessary files for it:
+Package the application:
 
 ```bash
-cmake ..
+cd python
+pip install pyinstaller
+python -m PyInstaller --noconsole --onefile --add-data "archive_py.pyd;." gui.py
+```
+
+Executable output paths:
+
+- Windows: python/dist/gui.exe
+- Linux: python/dist/gui
+- macOS: python/dist/gui
+
+### How to Use Version 2.x
+
+Run the executable file.
+
+Compressing a file:
+
+1. Click the Compress File button.
+2. Select the file in the dialog window.
+3. Select the destination path.
+
+Decompressing an archive:
+
+1. Click the Decompress File button.
+2. Select the archive file.
+3. Select the destination path.
+
+---
+
+## Version 1.x (Console Version)
+
+Console application written in C++17.
+
+### Features
+
+- Text menu interface
+- Direct C++ file processing
+- Interactive terminal menu
+
+### Build Requirements
+
+- CMake 3.15 or newer
+- C++17 compiler (MSVC, GCC, or Clang)
+
+### Building Version 1.x
+
+Clone the repository:
+
+```bash
+git clone [https://github.com/Mr-Ordinary-UA/simple-archiver.git](https://github.com/Mr-Ordinary-UA/simple-archiver.git)
+cd simple-archiver
 ```
 
 Build the project:
 
 ```bash
+mkdir build
+cd build
+cmake ..
 cmake --build .
 ```
 
-After completion, the executable appears inside the `build` folder.
+Executable output paths:
 
-| Environment | Executable path |
-|---|---|
-| Windows, Visual Studio | `build/Debug/archive.exe` |
-| Windows, MinGW | `build/archive.exe` |
-| Linux | `build/archive` |
+- Windows (MSVC): build/Debug/archive.exe
+- Windows (MinGW): build/archive.exe
+- Linux: build/archive
 
-## Pre-built Executable
+### How to Use Version 1.x
 
-If you do not want to build the project yourself, a ready-made Windows executable is available in the [Releases](https://github.com/Mr-Ordinary-UA/simple-archiver/releases) section of this repository. Download the latest version and run it directly.
+Run the terminal application. Select an option from the menu:
 
-## How to Use the Program
-
-After launch, a menu with three options opens:
-
-```
 1. Compress file
 2. Decompress file
 3. Exit
-```
 
-### Compressing a file
+Compressing a file:
 
-1. Select option `1`.
-2. Enter the path to the file you want to compress.
-3. Enter the path to save the archive, for example `photo.rle`.
+1. Select option 1.
+2. Enter the source file path.
+3. Enter the destination archive path.
 
-The program shows the size before and after compression, along with the compression ratio. The original file is deleted after successful compression.
+Decompressing an archive:
 
-### Decompressing a file
+1. Select option 2.
+2. Enter the archive path.
+3. Enter the destination file path.
 
-1. Select option `2`.
-2. Enter the path to the archive.
-3. Enter the path to save the restored file.
+---
 
-The archive is deleted after successful decompression.
+## Pre-built Executables
 
-Paths can be relative (`photo.jpg`, if the file is next to the program) or absolute (`C:\Users\Name\Desktop\photo.jpg`).
+Pre-compiled binaries for Windows, Linux, and macOS are available in the Releases section of this repository.
 
-## Archive Format
+## Archive Format Structure
 
-The archive file begins with the `RLE1` signature, followed by one byte indicating the mode: compressed data or raw (unmodified) data. This lets the program verify, during decompression, that the file is a valid archive of this format, and select the correct data restoration method.
+The binary file begins with the RLE1 signature header. The next byte indicates the compression mode. The application verifies this header before extraction.
 
 ## License
 
-This project is distributed under the MIT license. The full text is available in the [LICENSE](./LICENSE) file.
+This project is released under the MIT license. The full text is available in the LICENSE file.

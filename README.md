@@ -8,7 +8,7 @@ Run-Length Encoding replaces identical repeating byte sequences with count-value
 
 The method works well on files with repeating data. On random or previously compressed data, the size after compression does not decrease. The application detects such cases and saves raw unmodified data.
 
-## Version 3.x / GUI Container Version
+## Version 2.1 / GUI Container Version
 
 Advanced hybrid architecture supporting multi-file containers, directory hierarchies, and cross-platform Self-Extracting packages.
 

@@ -40,6 +40,18 @@ jobs:
       - name: Build Installer with Inno Setup (Windows)
         if: matrix.os == 'windows-latest'
         run: iscc installer.iss
+      - name: Package DEB (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir -p deb_pkg/usr/local/bin
+          cp dist/gui deb_pkg/usr/local/bin/simple-archiver
+          mkdir -p deb_pkg/DEBIAN
+          echo "Package: simple-archiver" > deb_pkg/DEBIAN/control
+          echo "Version: 1.0" >> deb_pkg/DEBIAN/control
+          echo "Architecture: amd64" >> deb_pkg/DEBIAN/control
+          echo "Maintainer: User" >> deb_pkg/DEBIAN/control
+          echo "Description: Archiver" >> deb_pkg/DEBIAN/control
+          dpkg-deb --build deb_pkg SimpleArchiver.deb
       - name: Package PKG (macOS)
         if: matrix.os == 'macos-latest' || matrix.os == 'macos-14'
         run: |

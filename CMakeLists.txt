@@ -8,14 +8,17 @@ if(WIN32)
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
 endif()
 
-add_executable(archive archive.cpp archive_core.cpp)
+add_executable(archive archive.cpp archive_core.cpp archive_container.cpp)
+add_executable(sfx_stub sfx_main.cpp)
+if(MSVC)
+    set_property(TARGET sfx_stub PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
 if(MSVC)
     set_property(TARGET archive PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-
 include(FetchContent)
 FetchContent_Declare(
     pybind11
@@ -24,7 +27,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
-pybind11_add_module(archive_py bindings.cpp archive_core.cpp)
+pybind11_add_module(archive_py bindings.cpp archive_core.cpp archive_container.cpp)
 
 set_target_properties(archive_py PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python

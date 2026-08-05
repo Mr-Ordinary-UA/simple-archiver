@@ -1,66 +1,59 @@
 name: Build and Release
-
 on:
   push:
     tags:
       - 'v*'
-
 permissions:
   contents: write
-
 jobs:
   build:
     strategy:
       matrix:
         include:
           - os: windows-latest
-            asset_name: archive-gui-windows-x64.exe
+            asset_name: SimpleArchiver_Setup.exe
           - os: ubuntu-latest
-            asset_name: archive-gui-linux-x64
+            asset_name: SimpleArchiver.deb
           - os: macos-latest
-            asset_name: archive-gui-macos-arm64
+            asset_name: SimpleArchiver-macos-arm64.pkg
           - os: macos-14
-            asset_name: archive-gui-macos-x64
+            asset_name: SimpleArchiver-macos-x64.pkg
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install PyInstaller
         run: pip install pyinstaller
-
       - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
-
       - name: Build C++ Core
         run: cmake --build build --config Release
-
       - name: Package with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: pyinstaller --noconsole --onefile --add-data "python\*.pyd;." python\gui.py
-
       - name: Package with PyInstaller (Unix)
         if: matrix.os != 'windows-latest'
         run: pyinstaller --noconsole --onefile --add-data "python/*.so:." python/gui.py
-
-      - name: Rename binary (Windows)
+      - name: Build Installer with Inno Setup (Windows)
         if: matrix.os == 'windows-latest'
-        run: move dist\gui.exe ${{ matrix.asset_name }}
-
-      - name: Rename binary (Unix)
-        if: matrix.os != 'windows-latest'
-        run: mv dist/gui ${{ matrix.asset_name }}
-
+        run: iscc installer.iss
+      - name: Package PKG (macOS)
+        if: matrix.os == 'macos-latest' || matrix.os == 'macos-14'
+        run: |
+          mkdir -p app_root/usr/local/bin
+          cp dist/gui app_root/usr/local/bin/simple-archiver
+          pkgbuild --root app_root --identifier com.simplearchiver.app --version 1.0 ${{ matrix.asset_name }}
+      - name: Move Windows Installer
+        if: matrix.os == 'windows-latest'
+        run: move Output\SimpleArchiver_Setup.exe ${{ matrix.asset_name }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
           path: ${{ matrix.asset_name }}
-
   release:
     needs: build
     runs-on: ubuntu-latest
@@ -69,7 +62,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:

@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
-#include <tuple>
+#include <pybind11/stl.h>
 #include "archive_core.h"
+#include "archive_container.h"
 
 namespace py = pybind11;
 
@@ -31,6 +32,6 @@ PYBIND11_MODULE(archive_py, m)
         })
         .def("decompress", &RLE::decompress);
 
-    m.def("result_to_string", &resultToString);
-    m.def("peek_original_name", &peekOriginalName);
+    m.def("pack_files_raw", &packFilesRaw);
+    m.def("unpack_files_raw", &unpackFilesRaw);
 }

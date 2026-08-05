@@ -1,22 +1,23 @@
-# simple-archiver
+# Simple Archiver
 
-A file archiver based on the RLE (Run-Length Encoding) algorithm. This project demonstrates file handling, binary data processing, and C++ performance with Python GUI integration.
+A file archiver based on the Run-Length Encoding algorithm. This project demonstrates file handling, binary data processing, and C++ performance with Python GUI integration.
 
 ## RLE Description
 
-RLE replaces identical repeating byte sequences with count-value pairs. A sequence of ten identical characters takes less space in compressed form than in the original file.
+Run-Length Encoding replaces identical repeating byte sequences with count-value pairs. A sequence of ten identical characters takes less space in compressed form than in the original file.
 
 The method works well on files with repeating data. On random or previously compressed data, the size after compression does not decrease. The application detects such cases and saves raw unmodified data.
 
-## Version 2.x (GUI Version)
+## Version 3.x / GUI Container Version
 
-Graphical interface version built with Python Tkinter and C++ core via pybind11.
+Advanced hybrid architecture supporting multi-file containers, directory hierarchies, and cross-platform Self-Extracting packages.
 
 ### Features
 
-- Graphical interface built with Tkinter
-- Fast C++ compression core integrated via pybind11
-- Automated cross-platform builds for Windows, Linux, and macOS
+- Hybrid architecture with a high-performance C++ core and Python Tkinter GUI.
+- Multi-file and directory container support preserving directory structures.
+- Automatic compression optimization.
+- Self-Extracting archive generation and automated cross-platform releases via GitHub Actions.
 
 ### Build Requirements
 
@@ -24,54 +25,35 @@ Graphical interface version built with Python Tkinter and C++ core via pybind11.
 - C++17 compiler (MSVC, GCC, or Clang)
 - Python 3.11 or newer
 - PyInstaller module
+- Inno Setup (for Windows installer building on CI)
 
-### Building Version 2.x
+### Building and Packaging
 
 Clone the repository:
 
 ```bash
-git clone [https://github.com/Mr-Ordinary-UA/simple-archiver.git](https://github.com/Mr-Ordinary-UA/simple-archiver.git)
+git clone https://github.com/Mr-Ordinary-UA/simple-archiver.git
 cd simple-archiver
 ```
 
-Build the C++ core:
+Build the C++ core and Python bindings:
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 ```
 
-Package the application:
+### How to Use the GUI Version
+
+Run the application from the python directory:
 
 ```bash
 cd python
-pip install pyinstaller
-python -m PyInstaller --noconsole --onefile --add-data "archive_py.pyd;." gui.py
+python gui.py
 ```
 
-Executable output paths:
-
-- Windows: python/dist/gui.exe
-- Linux: python/dist/gui
-- macOS: python/dist/gui
-
-### How to Use Version 2.x
-
-Run the executable file.
-
-Compressing a file:
-
-1. Click the Compress File button.
-2. Select the file in the dialog window.
-3. Select the destination path.
-
-Decompressing an archive:
-
-1. Click the Decompress File button.
-2. Select the archive file.
-3. Select the destination path.
-
----
+- **Compressing files or folders:** Select the compress mode, add individual files or entire folders using the interface buttons, and create the archive.
+- **Decompressing an archive:** Switch to decompress mode, select the archive, and choose the target directory for extraction.
 
 ## Version 1.x (Console Version)
 
@@ -93,7 +75,7 @@ Console application written in C++17.
 Clone the repository:
 
 ```bash
-git clone [https://github.com/Mr-Ordinary-UA/simple-archiver.git](https://github.com/Mr-Ordinary-UA/simple-archiver.git)
+git clone https://github.com/Mr-Ordinary-UA/simple-archiver.git
 cd simple-archiver
 ```
 
@@ -106,41 +88,30 @@ cmake ..
 cmake --build .
 ```
 
-Executable output paths:
+### Executable Output Paths
 
-- Windows (MSVC): build/Debug/archive.exe
-- Windows (MinGW): build/archive.exe
-- Linux: build/archive
+- Windows (MSVC): `build/Debug/archive.exe`
+- Windows (MinGW): `build/archive.exe`
+- Linux: `build/archive`
 
 ### How to Use Version 1.x
 
-Run the terminal application. Select an option from the menu:
+Run the terminal application and select an option from the menu:
 
 1. Compress file
 2. Decompress file
 3. Exit
 
-Compressing a file:
+- **Compressing a file:** Select option one, enter the source file path, and enter the destination archive path.
+- **Decompressing an archive:** Select option two, enter the archive path, and enter the destination file path.
 
-1. Select option 1.
-2. Enter the source file path.
-3. Enter the destination archive path.
+## Pre-built Executables & Installers
 
-Decompressing an archive:
-
-1. Select option 2.
-2. Enter the archive path.
-3. Enter the destination file path.
-
----
-
-## Pre-built Executables
-
-Pre-compiled binaries for Windows, Linux, and macOS are available in the Releases section of this repository.
+Pre-compiled binaries, Windows setup packages, macOS packages, and Linux packages are available in the Releases section of this repository.
 
 ## Archive Format Structure
 
-The binary file begins with the RLE1 signature header. The next byte indicates the compression mode. The application verifies this header before extraction.
+The binary container format begins with a custom signature header, volume indicators, total file count, and individual file metadata headers containing relative paths, directory flags, original sizes, and compression modes, followed by the payload data.
 
 ## License
 
